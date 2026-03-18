@@ -15,7 +15,10 @@ exports.mostrarProfesores = async (req, res) => {
       LEFT JOIN curso_profesor_materia cpm ON profesores.id = cpm.profesor_id
       LEFT JOIN cursos ON cursos.id = cpm.curso_id
       LEFT JOIN materias ON materias.id = cpm.materia_id
-      ORDER BY cursos.orden, profesores.apellido
+      ORDER BY 
+      cursos.orden, 
+      profesores.apellido COLLATE utf8mb4_spanish_ci, 
+      profesores.nombre
     `);
 
     // Agrupar profesores por curso

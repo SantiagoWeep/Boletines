@@ -114,7 +114,11 @@ exports.buscarBoletines = async (req, res) => {
         OR a.dni LIKE ?
         OR v.curso LIKE ?
       )
-      ORDER BY v.curso, a.apellido, a.nombre, v.materia
+      ORDER BY 
+        v.curso, 
+        a.apellido COLLATE utf8mb4_spanish_ci, 
+        a.nombre, 
+        v.materia
       LIMIT 50
     `,[ciclo, `%${q}%`, `%${q}%`, `%${q}%`, `%${q}%`]);
 

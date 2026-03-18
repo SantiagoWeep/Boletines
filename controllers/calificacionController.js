@@ -8,31 +8,36 @@ exports.mostrarListaAlumnos = async (req, res) => {
   const nombreCompleto = `${req.profesor.nombre} ${req.profesor.apellido}`;
   const ciclo = req.ciclo;
  
-  const query = `
-    SELECT 
-      c.id AS curso_id,
-      c.nombre AS curso_nombre,
-      m.id AS materia_id,
-      m.nombre AS materia_nombre,
-      a.id AS alumno_id,
-      a.nombre AS alumno_nombre,
-      a.apellido AS alumno_apellido,
-      n.trimestre,
-      n.numero,
-      n.nota
-    FROM curso_profesor_materia cpm
-    JOIN cursos c ON c.id = cpm.curso_id
-    JOIN materias m ON m.id = cpm.materia_id
-    JOIN alumnos a ON a.curso_id = c.id
-   LEFT JOIN notas n 
+const query = `
+  SELECT 
+    c.id AS curso_id,
+    c.nombre AS curso_nombre,
+    m.id AS materia_id,
+    m.nombre AS materia_nombre,
+    a.id AS alumno_id,
+    a.nombre AS alumno_nombre,
+    a.apellido AS alumno_apellido,
+    n.trimestre,
+    n.numero,
+    n.nota
+  FROM curso_profesor_materia cpm
+  JOIN cursos c ON c.id = cpm.curso_id
+  JOIN materias m ON m.id = cpm.materia_id
+  JOIN alumnos a 
+    ON a.curso_id = c.id
+    AND a.ciclo_id = ?
+  LEFT JOIN notas n 
     ON n.alumno_id = a.id 
     AND n.curso_id = c.id 
     AND n.materia_id = m.id
     AND n.ciclo_id = ?
-  `;
+  WHERE 
+    cpm.profesor_id = ?
+  AND (cpm.ciclo_id = ? OR cpm.ciclo_id IS NULL)
+`;
 
   try {
-    const [results] = await db.query(query, [ciclo]);
+    const [results] = await db.query(query, [ciclo, ciclo, profesorId, ciclo]);
 
     const cursos = {};
 

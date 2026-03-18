@@ -375,7 +375,10 @@ exports.imprimirNotas = async (req, res) => {
         estado
       };;
       })
-      .sort((a,b) => a.apellido.localeCompare(b.apellido) || a.nombre.localeCompare(b.nombre));
+      .sort((a,b) => 
+          (a.apellido || '').localeCompare(b.apellido || '', 'es', { sensitivity: 'base' }) || 
+          (a.nombre || '').localeCompare(b.nombre || '', 'es', { sensitivity: 'base' })
+        );
 
       const cicloId = req.session.ciclo;
 
