@@ -86,38 +86,20 @@
         <h2><%= materia.nombre %></h2>
         <div class="notas">
 
-         <p>
-            <strong>1° Trimestre:</strong>
-
-            <% if (materia.notas.T1 >= 6) { %>
-            <span><%= materia.notas.T1 %></span>
-            <% } else { %>
-            <span style="color:red;font-weight:bold">EP</span>
-            <% } %>
-
-            </p>
+        <p>
+  <strong>1° Trimestre:</strong>
+  <span><%= materia.notas.T1 %></span>
+</p>
 
           <p>
             <strong>2° Trimestre:</strong>
-
-            <% if (materia.notas.T2 >= 6) { %>
             <span><%= materia.notas.T2 %></span>
-            <% } else { %>
-            <span style="color:red;font-weight:bold">EP</span>
-            <% } %>
+          </p>
 
-            </p>
-
-         <p>
+          <p>
             <strong>3° Trimestre:</strong>
-
-            <% if (materia.notas.T3 >= 6) { %>
             <span><%= materia.notas.T3 %></span>
-            <% } else { %>
-            <span style="color:red;font-weight:bold">EP</span>
-            <% } %>
-
-            </p>
+          </p>
 
             <% if (materia.examenDic) { %>
               <p>
@@ -135,19 +117,11 @@
 
 
           <p class="promedio">
-              <strong>Promedio Final:</strong>
-
-              <% if (materia.estado === "EP") { %>
-
-              <span style="color:red;font-weight:bold">EP</span>
-
-              <% } else { %>
-
-              <span style="color:#116e05"><%= materia.promedioFinal %></span>
-
-              <% } %>
-
-           </p>     
+  <strong>Promedio Final:</strong>
+  <span style="color:#116e05">
+    <%= materia.promedioFinal %>
+  </span>
+</p>   
 
         </div>
       </div>

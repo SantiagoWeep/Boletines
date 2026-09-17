@@ -374,208 +374,479 @@ body {
 
   <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
 <script>
+
+  // ============================================================
+  // TRUNCAR A 2 DECIMALES
+  // ============================================================
+
   function truncar2dec(valor) {
     return Math.floor(valor * 100) / 100;
   }
 
+
+  // ============================================================
+  // CALCULAR PROMEDIOS
+  // ============================================================
+
   function calcularPromedios() {
+
     document.querySelectorAll('tbody tr').forEach(tr => {
-      const promedioInputs = tr.querySelectorAll('.promedio-trimestre');
-      const promedioFinalInput = tr.querySelector('.promedio-final');
-      const exDicInput = tr.querySelector('.examen-dic');
-      const exMarInput = tr.querySelector('.examen-mar');
+
+      const promedioInputs =
+        tr.querySelectorAll('.promedio-trimestre');
+
+      const promedioFinalInput =
+        tr.querySelector('.promedio-final');
+
+      const exDicInput =
+        tr.querySelector('.examen-dic');
+
+      const exMarInput =
+        tr.querySelector('.examen-mar');
+
 
       let promedios = [];
 
+
+      // ========================================================
+      // PROMEDIOS DE LOS TRIMESTRES
+      // ========================================================
+
       promedioInputs.forEach(promInput => {
-      const trimestre = promInput.dataset.trimestre;
-      const alumnoId = promInput.dataset.alumno;
-      const materiaId = promInput.dataset.materia;
-      const cursoId = promInput.dataset.curso;
-      let notas = [];
 
-      for (let i = 1; i <= 4; i++) {
-        const name = `nota_${alumnoId}_${cursoId}_${materiaId}_${trimestre}_${i}`;
-        const inputNota = tr.querySelector(`input[name="${name}"]`);
-        if (inputNota) {
-          // Solo considerar valores válidos y que no sean vacíos
-          const valStr = inputNota.value.trim();
-          if (valStr !== '') {
-            const val = parseFloat(valStr);
-            if (!isNaN(val)) {
-              notas.push(val);
+        const trimestre = promInput.dataset.trimestre;
+        const alumnoId = promInput.dataset.alumno;
+        const materiaId = promInput.dataset.materia;
+        const cursoId = promInput.dataset.curso;
+
+        let notas = [];
+
+
+        for (let i = 1; i <= 4; i++) {
+
+          const name =
+            `nota_${alumnoId}_${cursoId}_${materiaId}_${trimestre}_${i}`;
+
+          const inputNota =
+            tr.querySelector(`input[name="${name}"]`);
+
+
+          if (inputNota) {
+
+            const valStr = inputNota.value.trim();
+
+
+            if (valStr !== '') {
+
+              const val = parseFloat(valStr);
+
+
+              if (!isNaN(val)) {
+                notas.push(val);
+              }
+
             }
+
           }
-          // NO cambiar inputNota.value aquí para respetar lo que puso el usuario
+
         }
-      }
 
-      if (notas.length > 0) {
-        const suma = notas.reduce((a, b) => a + b, 0);
-        const promedio = truncar2dec(suma / notas.length);
 
-        if (promedio < 6) {
-          promInput.value = "EP";
-          promInput.style.color = "orange";
-          promInput.style.fontWeight = "bold";
-        } else {
+        // ======================================================
+        // SI HAY NOTAS
+        // ======================================================
+
+        if (notas.length > 0) {
+
+          const suma =
+            notas.reduce((a, b) => a + b, 0);
+
+          const promedio =
+            truncar2dec(suma / notas.length);
+
+
+          // Mostrar SIEMPRE el número.
+          // Nunca "EP".
           promInput.value = promedio.toFixed(2);
+
           promInput.style.color = "";
+          promInput.style.fontWeight = "";
+
+
+          // Guardamos el promedio trimestral
+          promedios.push(promedio);
+
+
+        } else {
+
+          // No hay notas cargadas
+          promInput.value = '';
+
         }
 
-        promedios.push(promedio);
+      });
+
+
+      // ========================================================
+      // DICIEMBRE Y MARZO
+      // ========================================================
+
+      const exDicVal =
+        parseFloat(exDicInput.value);
+
+      const exMarVal =
+        parseFloat(exMarInput.value);
+
+
+      // ========================================================
+      // DETERMINAR SI HAY ALGÚN TRIMESTRE DESAPROBADO
+      // ========================================================
+
+      const hayTrimestreDesaprobado =
+        promedios.some(p => p < 6);
+
+
+      // ========================================================
+      // SI HAY TRIMESTRE DESAPROBADO
+      // SE HABILITAN LOS EXÁMENES
+      // ========================================================
+
+      if (hayTrimestreDesaprobado) {
+
+        exDicInput.disabled = false;
+
+        exMarInput.disabled = false;
+
+        exDicInput.style.background = '';
+        exMarInput.style.background = '';
+
 
       } else {
-        promInput.value = '';
+
+        // Todos los trimestres aprobados
+        // No corresponde diciembre ni marzo
+
+        exDicInput.value = '';
+        exMarInput.value = '';
+
+        exDicInput.disabled = true;
+        exMarInput.disabled = true;
+
+        exDicInput.style.background = '#eee';
+        exMarInput.style.background = '#eee';
+
       }
+
+
+      // ========================================================
+      // PROMEDIO FINAL
+      // ========================================================
+
+      let promedioFinal = null;
+
+
+      // Si todavía no tenemos los tres promedios,
+      // no calculamos promedio anual.
+
+      if (promedios.length === 3) {
+
+        // ------------------------------------------------------
+        // PROMEDIO GENERAL
+        // Se calcula sobre los promedios trimestrales YA
+        // TRUNCADOS.
+        // ------------------------------------------------------
+
+        const promedioAnual =
+          truncar2dec(
+            promedios.reduce((a, b) => a + b, 0) / 3
+          );
+
+
+        // ------------------------------------------------------
+        // SI EL PROMEDIO ANUAL ES >= 6
+        // ------------------------------------------------------
+
+        if (promedioAnual >= 6) {
+
+          promedioFinal = promedioAnual;
+
+
+          // Diciembre y marzo no corresponden
+
+          exDicInput.value = '';
+          exMarInput.value = '';
+
+          exDicInput.disabled = true;
+          exMarInput.disabled = true;
+
+          exDicInput.style.background = '#eee';
+          exMarInput.style.background = '#eee';
+
+
+        } else {
+
+          // ----------------------------------------------------
+          // PROMEDIO ANUAL < 6
+          // SE PUEDE RENDIR DICIEMBRE
+          // ----------------------------------------------------
+
+          if (!isNaN(exDicVal) && exDicVal >= 6) {
+
+            promedioFinal = exDicVal;
+
+
+            // Si aprobó diciembre,
+            // marzo queda deshabilitado.
+
+            exMarInput.value = '';
+            exMarInput.disabled = true;
+            exMarInput.style.background = '#eee';
+
+
+          } else {
+
+            // --------------------------------------------------
+            // DICIEMBRE NO APROBADO
+            // MARZO PUEDE SER UTILIZADO
+            // --------------------------------------------------
+
+            exMarInput.disabled = false;
+            exMarInput.style.background = '';
+
+
+            if (!isNaN(exMarVal) && exMarVal >= 6) {
+
+              promedioFinal = exMarVal;
+
+            } else {
+
+              // Ningún examen aprobó.
+              // Se conserva el promedio anual.
+
+              promedioFinal = promedioAnual;
+
+            }
+
+          }
+
+        }
+
+      }
+
+
+      // ========================================================
+      // MOSTRAR PROMEDIO FINAL
+      // ========================================================
+
+      if (promedioFinal !== null) {
+
+        promedioFinalInput.value =
+          Number(promedioFinal).toFixed(2);
+
+        promedioFinalInput.style.color = '';
+        promedioFinalInput.style.fontWeight = '';
+
+      } else {
+
+        promedioFinalInput.value = '';
+
+      }
+
     });
 
-    const exDicVal = parseFloat(exDicInput.value);
-const exMarVal = parseFloat(exMarInput.value);
-
-let promedioFinal = null;
-let hayEP = false;
-
-// detectar EP
-promedios.forEach(p => {
-  if (p < 6) hayEP = true;
-});
-
-// si hay EP
-if (hayEP) {
-
-  if (!isNaN(exDicVal) && exDicVal >= 6) {
-    promedioFinal = exDicVal.toFixed(2);
-
-  } else if (!isNaN(exMarVal) && exMarVal >= 6) {
-    promedioFinal = exMarVal.toFixed(2);
-
-  } else {
-    promedioFinal = "EP";
   }
 
-  if (promedioFinal === "EP") {
-  promedioFinalInput.value = "EP";
-  promedioFinalInput.style.color = "orange";
-}
 
-} else {
+  // ============================================================
+  // RECALCULAR CUANDO CAMBIA UNA NOTA
+  // ============================================================
 
-  const prom = truncar2dec(
-    promedios.reduce((a, b) => a + b, 0) / promedios.length
-  );
+  document
+    .querySelectorAll('input.nota, input.examen')
+    .forEach(input => {
 
-  promedioFinal = prom.toFixed(2);
+      input.addEventListener('input', calcularPromedios);
 
-}
-
-if (promedioFinal === "EP") {
-  promedioFinalInput.value = "EP";
-  promedioFinalInput.style.color = "orange";
-} else {
-  promedioFinalInput.value = promedioFinal;
-  promedioFinalInput.style.color = "";
-}  
-
-    if (!hayEP) {
-      exDicInput.style.background = "#eee";
-      exMarInput.style.background = "#eee";
-    } else {
-      exDicInput.style.background = "";
-      exMarInput.style.background = "";
-    }
     });
-  }
 
 
-  document.querySelectorAll('input.nota, input.examen').forEach(input => {
-  input.addEventListener('input', calcularPromedios);
-});
+  // ============================================================
+  // EVITAR COMPORTAMIENTOS EXTRAÑOS CON CAMPOS VACÍOS
+  // ============================================================
 
-document.querySelectorAll('input.nota, input.examen').forEach(input => {
-  input.addEventListener('blur', () => {
-    if (input.value.trim() === '') {
-      input.value = '';
-    }
-  });
-});
-  // Escuchar cambios
-  document.querySelector('form').addEventListener('submit', function () {
+  document
+    .querySelectorAll('input.nota, input.examen')
+    .forEach(input => {
 
-  document.querySelectorAll('input').forEach(input => {
-    input.disabled = false;
-  });
+      input.addEventListener('blur', () => {
 
-});
+        if (input.value.trim() === '') {
+          input.value = '';
+        }
 
-  // Calcular al cargar
+      });
+
+    });
+
+
+  // ============================================================
+  // ANTES DE ENVIAR
+  // ============================================================
+
+  document
+    .querySelector('form')
+    .addEventListener('submit', function () {
+
+      document
+        .querySelectorAll('input')
+        .forEach(input => {
+
+          input.disabled = false;
+
+        });
+
+    });
+
+
+  // ============================================================
+  // CALCULAR AL CARGAR
+  // ============================================================
+
   calcularPromedios();
 
 
-  
+  // ============================================================
+  // CERRAR MENSAJE DE GUARDADO
+  // ============================================================
+
   setTimeout(() => {
-    const alert = document.querySelector('.alert');
+
+    const alert =
+      document.querySelector('.alert');
+
     if (alert) {
-      const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+
+      const bsAlert =
+        bootstrap.Alert.getOrCreateInstance(alert);
+
       bsAlert.close();
+
     }
+
   }, 4000);
 
-  
+
+  // ============================================================
+  // LIMPIAR ?guardado=1 DE LA URL
+  // ============================================================
+
   if (window.location.search.includes('guardado=1')) {
-    const newUrl = window.location.origin + window.location.pathname;
-    window.history.replaceState({}, document.title, newUrl);
+
+    const newUrl =
+      window.location.origin +
+      window.location.pathname;
+
+    window.history.replaceState(
+      {},
+      document.title,
+      newUrl
+    );
+
   }
 
+
+  // ============================================================
+  // DETECTAR CAMBIOS SIN GUARDAR
+  // ============================================================
 
   let hayCambios = false;
 
-  // Detectar cambios en inputs relevantes
-  document.querySelectorAll('input.nota, input.examen').forEach(input => {
-    input.addEventListener('input', () => {
-      hayCambios = true;
+
+  document
+    .querySelectorAll('input.nota, input.examen')
+    .forEach(input => {
+
+      input.addEventListener('input', () => {
+
+        hayCambios = true;
+
+      });
+
     });
-  });
 
-  // Cuando se envía el formulario, ya no hay cambios pendientes
-  document.querySelector('form').addEventListener('submit', () => {
-    hayCambios = false;
-  });
 
-  // Aviso antes de salir si hay cambios sin guardar
+  document
+    .querySelector('form')
+    .addEventListener('submit', () => {
+
+      hayCambios = false;
+
+    });
+
+
   window.addEventListener('beforeunload', (e) => {
+
     if (hayCambios) {
+
       e.preventDefault();
-      e.returnValue = ''; 
+      e.returnValue = '';
+
     }
-  });
 
-// bloque de form al enviar 
-
-
-   document.querySelector('form').addEventListener('submit', function () {
-    document.querySelectorAll('.btn-guardar').forEach(btn => {
-      btn.disabled = true;
-      btn.innerText = 'Guardando...'; // opcional
-    });
   });
 
 
+  // ============================================================
+  // DESHABILITAR BOTÓN MIENTRAS GUARDA
+  // ============================================================
 
-  
-document.addEventListener("DOMContentLoaded", () => {
-  const ahora = new Date();
-  const mes = ahora.getMonth() + 1; // 1-12
+  document
+    .querySelector('form')
+    .addEventListener('submit', function () {
 
-  if ([12, 1, 3].includes(mes)) {
-    document.querySelectorAll(".examen-esp").forEach(el => {
-      el.style.setProperty("display", "table-cell");
+      document
+        .querySelectorAll('.btn-guardar')
+        .forEach(btn => {
+
+          btn.disabled = true;
+          btn.innerText = 'Guardando...';
+
+        });
+
     });
-  }
-});
 
+
+  // ============================================================
+  // MOSTRAR EXÁMENES ESPECIALES SEGÚN EL MES
+  // ============================================================
+
+  document.addEventListener("DOMContentLoaded", () => {
+
+    const ahora = new Date();
+
+    const mes =
+      ahora.getMonth() + 1;
+
+
+    if ([12, 1, 3].includes(mes)) {
+
+      document
+        .querySelectorAll(".examen-esp")
+        .forEach(el => {
+
+          el.style.setProperty(
+            "display",
+            "table-cell"
+          );
+
+        });
+
+    }
+
+  });
 
 </script>
+
 
 </body>
 </html>

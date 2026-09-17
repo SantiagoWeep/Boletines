@@ -5,9 +5,9 @@ exports.mostrarAlumnos = async (req, res) => {
       SELECT alumnos.*, cursos.nombre AS curso_nombre, cursos.orden
       FROM alumnos
       JOIN cursos ON alumnos.curso_id = cursos.id
-      WHERE alumnos.ciclo_id = ?
+      
       ORDER BY cursos.orden ASC, alumnos.apellido ASC, alumnos.nombre ASC
-    `, [req.ciclo]);
+    `, []);
 
     const [cursos] = await db.query(`SELECT * FROM cursos ORDER BY orden`);
 
@@ -39,28 +39,51 @@ exports.mostrarAlumnos = async (req, res) => {
 
 
 
+
 exports.insertarAlumno = async (req, res) => {
-  const { nombre, apellido, dni, edad, telefono, tutor, curso_id, regular } = req.body;
+  const {
+    nombre,
+    apellido,
+    dni,
+    edad,
+    telefono,
+    tutor,
+    curso_id,
+    regular
+  } = req.body;
 
   try {
-    const ciclo = req.ciclo;
 
-        await db.query(`
-        INSERT INTO alumnos
-        (nombre, apellido, dni, edad, telefono, tutor, regular, curso_id, ciclo_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [
-        nombre, apellido, dni, edad,
-        telefono || null,
-        tutor || null,
-        regular === 'on',
-        curso_id,
-        ciclo
-        ]);
+    await db.query(`
+      INSERT INTO alumnos
+      (
+        nombre,
+        apellido,
+        dni,
+        edad,
+        telefono,
+        tutor,
+        regular,
+        curso_id
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      nombre,
+      apellido,
+      dni,
+      edad,
+      telefono || null,
+      tutor || null,
+      regular === 'on',
+      curso_id
+    ]);
 
     res.redirect('/administracion?success=Alumno agregado correctamente');
+
   } catch (error) {
+
     console.error(error);
+
     res.redirect('/administracion?error=Error al agregar el alumno');
   }
 };
@@ -100,13 +123,13 @@ exports.eliminarAlumno = async (req, res) => {
 
     await db.query(`
       DELETE FROM notas 
-      WHERE alumno_id = ? AND ciclo_id = ?
-    `, [id, req.ciclo]);
+      WHERE alumno_id = ?
+    `, [id]);
 
     await db.query(`
       DELETE FROM alumnos
-      WHERE id = ? AND ciclo_id = ?
-    `, [id, req.ciclo]);
+      WHERE id = ?
+    `, [id]);
 
     return res.status(200).json({ success: true, message: 'Alumno eliminado correctamente' });
 
@@ -141,13 +164,13 @@ exports.buscarAlumnos = async (req, res) => {
   SELECT alumnos.*, cursos.nombre AS curso_nombre, cursos.orden 
   FROM alumnos 
   JOIN cursos ON alumnos.curso_id = cursos.id 
-  WHERE alumnos.ciclo_id = ?
+ 
   AND (alumnos.nombre LIKE ? OR alumnos.apellido LIKE ? OR alumnos.dni LIKE ?)
   ORDER BY 
   cursos.orden ASC, 
   alumnos.apellido COLLATE utf8mb4_spanish_ci ASC, 
   alumnos.nombre ASC
-`, [req.ciclo, `%${q}%`, `%${q}%`, `%${q}%`]);
+`, [`%${q}%`, `%${q}%`, `%${q}%`]);
 
     const alumnosPorCurso = {};
     alumnos.forEach(alumno => {

@@ -159,107 +159,167 @@
 
 
  }
-  </style>
+ 
+</style>
+
 </head>
+
 <body>
+
   <h1>Notas Cargadas por los Profesores</h1>
-<div id="contenedorNotas">
-  <% cursos.forEach(curso => { %>
-    <h2>Curso: <%= curso.curso %></h2>
 
-    <% curso.materias.forEach(materia => { %>
-      <h3>Materia: <%= materia.materia_nombre %></h3>
-    <div class="profesor">Profesor: <%= materia.profesor_nombre %> <%= materia.profesor_apellido %></div>
+  <div id="contenedorNotas">
 
-      
-      <table class="tabla-curso-curso-<%= curso.curso.toLowerCase().replace(/\s/g, '-') %>">
+    <% cursos.forEach(curso => { %>
 
-        <thead>
-  <tr>
-  <th>Alumno</th>
-  <% [1, 2, 3].forEach(tri => { %>
-    <th>Notas</th>
-    <th class="promedio-trimestral">Prom.</th>  
-  <% }) %>
+      <h2>Curso: <%= curso.curso %></h2>
 
-  <th>Ex. Dic</th>
-  <th>Ex. Mar</th>
-  <th>Promedio Final</th>
-</tr>
-<tr>
-  <th></th>
-  <% [1, 2, 3].forEach(() => { %>
-  <th></th>
-  <th class="promedio-trimestral"></th>
-<% }) %>
+      <% curso.materias.forEach(materia => { %>
 
-  <th></th><th></th><th class="promedio-final"></th>
-</tr>
+        <h3>Materia: <%= materia.materia_nombre %></h3>
 
-</thead>
+        <div class="profesor">
+          Profesor: <%= materia.profesor_nombre %> <%= materia.profesor_apellido %>
+        </div>
 
-        <tbody>
-  <% materia.alumnos.forEach(alumno => { %>
-    <tr>
-      <td>
-        <%= alumno.apellido %>, <%= alumno.nombre %>
-      </td>
+        <table class="tabla-curso-curso-<%= curso.curso.toLowerCase().replace(/\s/g, '-') %>">
 
-      <% alumno.notas.forEach(nota => { 
-        const notasValidas = Object.values(nota.calificaciones)
-          .map(n => parseFloat(n))
-          .filter(n => !isNaN(n));
-        const promTrim = notasValidas.length 
-          ? (Math.trunc((notasValidas.reduce((a,b)=>a+b,0) / notasValidas.length) * 100) / 100).toFixed(2)
-          : '-';
-      %>
-        <td class="nota">
-          <div class="nota-grid">
-            <% [1,2,3,4].forEach(i => { %>
-              <div class="nota-celda">
-                <%= nota.calificaciones[i] ?? '-' %>
-              </div>
+          <thead>
+
+            <tr>
+
+              <th>Alumno</th>
+
+              <% [1, 2, 3].forEach(tri => { %>
+
+                <th>Notas</th>
+                <th class="promedio-trimestral">Prom.</th>
+
+              <% }) %>
+
+              <th>Ex. Dic</th>
+              <th>Ex. Mar</th>
+              <th>Promedio Final</th>
+
+            </tr>
+
+            <tr>
+
+              <th></th>
+
+              <% [1, 2, 3].forEach(() => { %>
+
+                <th></th>
+                <th class="promedio-trimestral"></th>
+
+              <% }) %>
+
+              <th></th>
+              <th></th>
+              <th class="promedio-final"></th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <% materia.alumnos.forEach(alumno => { %>
+
+              <tr>
+
+                <td>
+                  <%= alumno.apellido %>, <%= alumno.nombre %>
+                </td>
+
+                <% alumno.notas.forEach(nota => {
+
+                  const notasValidas = Object.values(nota.calificaciones)
+                    .map(n => parseFloat(n))
+                    .filter(n => !isNaN(n));
+
+                  const promTrim = notasValidas.length
+                    ? (
+                        Math.trunc(
+                          (notasValidas.reduce((a, b) => a + b, 0) / notasValidas.length) * 100
+                        ) / 100
+                      ).toFixed(2)
+                    : '-';
+
+                %>
+
+                  <td class="nota">
+
+                    <div class="nota-grid">
+
+                      <% [1, 2, 3, 4].forEach(i => { %>
+
+                        <div class="nota-celda">
+                          <%= nota.calificaciones[i] ?? '-' %>
+                        </div>
+
+                      <% }) %>
+
+                    </div>
+
+                  </td>
+
+                  <td class="promedio-trimestral">
+                    <%= promTrim %>
+                  </td>
+
+                <% }) %>
+
+                <td class="examen">
+                  <%= alumno.examen_dic ?? '-' %>
+                </td>
+
+                <td class="examen">
+                  <%= alumno.examen_mar ?? '-' %>
+                </td>
+
+                <td class="promedio-final">
+
+                  <% if (alumno.promedio_final !== null && alumno.promedio_final !== undefined) { %>
+
+                    <%= Number(alumno.promedio_final).toFixed(2) %>
+
+                  <% } else { %>
+
+                    -
+
+                  <% } %>
+
+                </td>
+
+              </tr>
+
             <% }) %>
-          </div>
-        </td>
-       <td class="promedio-trimestral">
-        <% if(promTrim !== '-' && promTrim < 6){ %>
-        <span class="ep"><%= promTrim %> (EP)</span>
-        <% } else { %>
-        <%= promTrim %>
-        <% } %>
-        </td>
+
+          </tbody>
+
+        </table>
+
+        <div class="text-end mt-2">
+
+          <a
+            href="/admin/notas/imprimir/<%= curso.curso_id %>/<%= materia.materia_id %>"
+            target="_blank"
+            class="btn btn-sm btn-secondary"
+          >
+            🖨️ Imprimir
+          </a>
+
+        </div>
+
       <% }) %>
 
-      <td class="examen"><%= alumno.examen_dic ?? '-' %></td>
-      <td class="examen"><%= alumno.examen_mar ?? '-' %></td>
-      <td class="promedio-final">
-        <% if(alumno.estado === 'EP'){ %>
-          EP
-          <% } else if(alumno.promedio_final !== null){ %>
-          <%= alumno.promedio_final.toFixed(2) %>
-          <% } else { %>
-          -
-          <% } %>
-        </td>
-    </tr>
-  <% }) %>
-</tbody>
-
-      </table>
-          <div class="text-end mt-2">
-      <a href="/admin/notas/imprimir/<%= curso.curso_id %>/<%= materia.materia_id %>" 
-        target="_blank"
-        class="btn btn-sm btn-secondary">
-        🖨️ Imprimir
-      </a>
-    </div>
-
     <% }) %>
-  <% }) %>
-  </div>
-</body>
-</html>
 
+  </div>
+
+</body>
+
+</html>
 
 <script src="/js/adminNotas.js"></script>

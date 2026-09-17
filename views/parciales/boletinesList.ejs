@@ -53,58 +53,70 @@ No se encontraron boletines
 </div>
 
 
-
 <% } else { %>
 
 <% alumnos.forEach(a => { %>
 
-<h2>
-Boletín de <%= a.alumno %> <%= a.apellido %> - Curso <%= a.curso %>
-</h2>
+  <h2>
+    Boletín de <%= a.alumno %> <%= a.apellido %>
+    - Curso <%= a.curso %>
 
-<table class="table">
+    <a
+      href="/admin/boletines/imprimir/boletin/<%= a.id %>"
+      target="_blank"
+      class="btn btn-sm btn-primary"
+    >
+      Imprimir
+    </a>
+  </h2>
 
-<thead>
-<tr>
-<th>Materia</th>
-<th>1T</th>
-<th>2T</th>
-<th>3T</th>
-<th>Prom</th>
-</tr>
-</thead>
+  <table class="table">
 
-<tbody>
+    <thead>
+      <tr>
+        <th>Materia</th>
+        <th>1T</th>
+        <th>2T</th>
+        <th>3T</th>
+        <th>Prom</th>
+      </tr>
+    </thead>
 
-<% a.materias.forEach(m => { %>
+    <tbody>
 
-<tr>
+      <% a.materias.forEach(m => { %>
 
-<td><%= m.materia %></td>
+        <tr>
 
-<td><%= m.t1 !== null && m.t1 < 6 ? 'EP' : (m.t1 ?? '-') %></td>
+          <td>
+            <%= m.materia %>
+          </td>
 
-<td><%= m.t2 !== null && m.t2 < 6 ? 'EP' : (m.t2 ?? '-') %></td>
+          <td>
+            <%= m.t1 ?? '-' %>
+          </td>
 
-<td><%= m.t3 !== null && m.t3 < 6 ? 'EP' : (m.t3 ?? '-') %></td>
+          <td>
+            <%= m.t2 ?? '-' %>
+          </td>
 
-<td>
-<% if(m.estado === 'EP'){ %>
-EP
-<% } else { %>
-<%= m.nota_final %>
-<% } %>
-</td>
+          <td>
+            <%= m.t3 ?? '-' %>
+          </td>
 
-</tr>
+          <td>
+            <%= m.nota_final ?? '-' %>
+          </td>
 
-<% }) %>
+        </tr>
 
-</tbody>
+      <% }) %>
 
-</table>
+    </tbody>
 
-<hr>
+  </table>
+
+  <hr>
 
 <% }) %>
 

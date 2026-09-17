@@ -1,208 +1,315 @@
+
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
 <meta charset="UTF-8">
-<title>  <%= materia.profesor %>-<%= materia.materia %>-Curso: <%= materia.curso %></title>
+
+<title>
+<%= materia.profesor %> - <%= materia.materia %> - <%= materia.curso %>
+</title>
 
 <style>
 
- @page {
-  margin: 6mm;
+@page{
+  size:A4 portrait;
+  margin:4mm;
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
+*{
+  box-sizing:border-box;
 }
 
-h1 { text-align: center; margin-bottom: 1em; }
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 40px;
-  page-break-inside: avoid;
+body{
+  font-family:Arial, sans-serif;
+  margin:0;
+  padding:0;
+  color:#000;
+  font-size:9px;
 }
 
-th, td {
-  border: 1px solid #000;
-  padding: 6px;
-  text-align: center;
-  font-size: 13px;
+.encabezado{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
 }
 
-thead th {
-  background-color: #e6e6e6;
-  font-weight: bold;
+.logo{
+  width:60px;
+  text-align:center;
 }
 
-/* COLUMNA DE ALUMNO MÁS ANCHA */
-td.col-alumno {
-  width: 320px;
-  text-align: left;
-  font-size: 13px;
+.logo img{
+  max-width:55px;
+  max-height:55px;
 }
 
-/* Ajustes de las columnas de notas */
-.nota {
-  width: 95px;
+.titulo{
+  flex:1;
+  text-align:center;
 }
 
-.nota-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  font-family: monospace;
-  font-size: 0.85em;
+.titulo h1{
+  margin:0;
+  font-size:18px;
 }
 
-.nota-celda {
-  border: 1px solid #999;
-  padding: 3px 0;
-  background: #fff;
-  padding: 2px;
+.titulo h2{
+  margin:2px 0;
+  font-size:12px;
 }
 
-.promedio-trimestral {
-  background-color: #f0f0f0;
-  font-weight: bold;
-  border: 2px solid #999;
-  width: 60px;
-  
+.titulo h3{
+  margin:0;
+  font-size:10px;
+  font-weight:normal;
 }
 
-.promedio-final {
-  background-color: #dcdcdc;
-  font-weight: bold;
-  border: 2px solid #777;
-  width: 70px;
+.datos{
+  margin-bottom:6px;
+  font-size:10px;
 }
 
-.examen {
-  background: #f8f8f8;
-  font-weight: bold;
-  border: 1px solid #555;
-  width: 55px;
+.datos div{
+  margin:2px 0;
 }
 
-.ep {
-  color: #c40000;
-  font-weight: bold;
- 
+table{
+  width:100%;
+  border-collapse:collapse;
+  page-break-inside:avoid;
+}
+
+th,
+td{
+  border:1px solid #000;
+  padding:2px;
+  text-align:center;
+  vertical-align:middle;
+}
+
+thead th{
+  background:#eaeaea;
+}
+
+.col-alumno{
+  width:220px;
+  text-align:left;
+  font-size:9px;
+  font-weight:bold;
+}
+
+.nota{
+  width:70px;
+}
+
+.nota-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+}
+
+.nota-celda{
+  border:1px solid #aaa;
+  padding:1px;
+  font-size:8px;
+}
+
+.promedio-trimestral{
+  width:40px;
+  font-weight:bold;
+  background:#f3f3f3;
+}
+
+.examen{
+  width:40px;
+}
+
+.promedio-final{
+  width:50px;
+  font-weight:bold;
+  background:#ddd;
+}
+
+.no-print{
+  margin-bottom:10px;
+}
+
+@media print{
+
+  .no-print{
+    display:none;
+  }
+
 }
 
 </style>
 
 </head>
+
 <body>
 
-<h1>Calificaciones <%= ciclo %> - EPET 42</h1>
+<button
+  class="no-print"
+  onclick="window.print()"
+>
+  Imprimir
+</button>
 
-<div class="encabezado-curso">
-  <h2>Curso: <%= materia.curso %></h2>
+<div class="encabezado">
+
+  <div class="logo">
+    <img src="/images/escudo.png" alt="Misiones">
+  </div>
+
+  <div class="titulo">
+    <h2>Provincia de Misiones</h2>
+    <h1>PLANILLA DE CALIFICACIONES</h1>
+    <h3>Ciclo Lectivo 2026</h3>
+  </div>
+
+  <div class="logo">
+    <img src="/images/logo.jpg" alt="Escuela">
+  </div>
+
 </div>
 
-<h3>Materia: <%= materia.materia %></h3>
-<div>Profesor: <%= materia.profesor %></div>
-<br>
+<div class="datos">
+
+  <div>
+    <strong>Curso:</strong> <%= materia.curso %>
+  </div>
+
+  <div>
+    <strong>Materia:</strong> <%= materia.materia %>
+  </div>
+
+  <div>
+    <strong>Profesor:</strong> <%= materia.profesor %>
+  </div>
+
+</div>
 
 <table>
 
-  <thead>
-    <tr>
-      <th rowspan="2">Alumno</th>
+<thead>
 
-      <% for (let tri = 1; tri <= 3; tri++) { %>
-        <th colspan="2">Trimestre <%= tri %></th>
-      <% } %>
+<tr>
 
-      <th rowspan="2">Ex. Dic</th>
-      <th rowspan="2">Ex. Mar</th>
-      <th rowspan="2">Prom. Gral.</th>
-    </tr>
+<th rowspan="2">Alumno</th>
 
-    <tr>
-      <% for (let tri = 1; tri <= 3; tri++) { %>
-        <th>Notas</th>
-        <th>Prom.</th>
-      <% } %>
-    </tr>
-  </thead>
+<% for(let tri=1; tri<=3; tri++){ %>
+  <th colspan="2">Trim. <%= tri %></th>
+<% } %>
 
-  <tbody>
+<th rowspan="2">Dic.</th>
+<th rowspan="2">Mar.</th>
+<th rowspan="2">Final</th>
 
-  <% alumnos.forEach(alumno => { %>
+</tr>
 
-    <tr>
-     <td class="col-alumno">
-      <%= alumno.apellido %>, <%= alumno.nombre %>
-    </td>
+<tr>
 
-      <% alumno.notas.forEach(nota => { 
-          const arr = Object.values(nota.calificaciones)
-            .map(x => parseFloat(x))
-            .filter(x => !isNaN(x));
+<% for(let tri=1; tri<=3; tri++){ %>
+  <th>Notas</th>
+  <th>Prom</th>
+<% } %>
 
-          const prom = arr.length ? (arr.reduce((a,b)=>a+b,0) / arr.length).toFixed(2) : '-';
-      %>
+</tr>
 
-        <td class="nota">
-          <div class="nota-grid">
-            <% [1,2,3,4].forEach(i => { %>
-              <div class="nota-celda"><%= nota.calificaciones[i] ?? '-' %></div>
-            <% }) %>
-          </div>
-        </td>
+</thead>
 
-        <td class="promedio-trimestral">
-        <% if(prom !== '-' && parseFloat(prom) < 6){ %>
-          <span class="ep"><%= prom %> (EP)</span>
-        <% } else { %>
-          <%= prom %>
-        <% } %>
-      </td>
+<tbody>
 
-      <% }) %>
+<% alumnos.forEach(alumno => { %>
 
-      <td class="examen"><%= alumno.examen_dic ?? '-' %></td>
-      <td class="examen"><%= alumno.examen_mar ?? '-' %></td>
+<tr>
 
-      <%
-        const todas = alumno.notas
-          .map(n => Object.values(n.calificaciones)
-            .map(x => parseFloat(x))
-            .filter(x => !isNaN(x))
-          )
-          .flat();
+<td class="col-alumno">
+  <%= alumno.apellido %>, <%= alumno.nombre %>
+</td>
 
-        const general = todas.length
-          ? (todas.reduce((a,b)=>a+b,0) / todas.length).toFixed(2)
-          : '-';
-      %>
+<% alumno.notas.forEach(nota => {
 
-    <td class="promedio-final">
-        <% if(alumno.estado === 'EP'){ %>
-          EP
-          <% } else if(alumno.promedio_final !== null){ %>
-          <%= alumno.promedio_final.toFixed(2) %>
-          <% } else { %>
-          -
-          <% } %>
-        </td>
-    </tr>
+  const arr = Object.values(nota.calificaciones)
+    .map(x => parseFloat(x))
+    .filter(x => !isNaN(x));
 
-  <% }) %>
+  const prom = arr.length
+    ? (Math.trunc((arr.reduce((a,b)=>a+b,0) / arr.length) * 100) / 100).toFixed(2)
+    : '-';
 
-  </tbody>
+%>
+
+<td class="nota">
+
+  <div class="nota-grid">
+
+    <% [1,2,3,4].forEach(i => { %>
+
+      <div class="nota-celda">
+        <%= nota.calificaciones[i] ?? '-' %>
+      </div>
+
+    <% }) %>
+
+  </div>
+
+</td>
+
+<td class="promedio-trimestral">
+  <%= prom %>
+</td>
+
+<% }) %>
+
+<td class="examen">
+  <%= alumno.examen_dic ?? '-' %>
+</td>
+
+<td class="examen">
+  <%= alumno.examen_mar ?? '-' %>
+</td>
+
+<td class="promedio-final">
+  <% if (
+    alumno.promedio_final !== null &&
+    alumno.promedio_final !== undefined
+  ) { %>
+
+    <%= Number(alumno.promedio_final).toFixed(2) %>
+
+  <% } else { %>
+
+    -
+
+  <% } %>
+</td>
+
+
+</tr>
+
+<% }) %>
+
+</tbody>
+
 </table>
+
 <script>
-  window.onload = function () {
-    window.print();
-    setTimeout(() => window.close(), 300);
-  };
+
+window.onload = () => {
+
+  window.print();
+
+  setTimeout(() => {
+    window.close();
+  }, 300);
+
+};
+
 </script>
 
-
 </body>
+
 </html>

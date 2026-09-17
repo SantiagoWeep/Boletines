@@ -30,9 +30,9 @@ examen_mar,
 nota_final
 FROM vista_boletines
 WHERE alumno_id = ?
-AND ciclo_id = ?
+
 ORDER BY materia
-`,[alumnoId, req.ciclo]);
+`,[alumnoId]);
 
 const materias = rows.map(r => ({
 

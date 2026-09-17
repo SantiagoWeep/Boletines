@@ -6,5 +6,6 @@ const { verifyAdministracion } = require('../controllers/authAdministracionContr
 
 router.get('/admin/boletines', verifyAdministracion, adminBoletinController.mostrarBoletines);
 router.get('/admin/boletines/buscar', verifyAdministracion, adminBoletinController.buscarBoletines);
+router.get('/admin/boletines/imprimir/boletin/:alumnoId', adminBoletinController.imprimirBoletin);
 
 module.exports = router;
