@@ -542,87 +542,119 @@ body {
       // PROMEDIO FINAL
       // ========================================================
 
-      // ========================================================
-// PROMEDIO FINAL
-// ========================================================
+      let promedioFinal = null;
 
-let promedioFinal = null;
 
-// --------------------------------------------------------
-// PROMEDIO GENERAL
-// Se calcula únicamente con los trimestres que tienen nota.
-// Cada promedio trimestral ya está truncado a 2 decimales.
-// --------------------------------------------------------
+      // Si todavía no tenemos los tres promedios,
+      // no calculamos promedio anual.
 
-if (promedios.length > 0) {
+      if (promedios.length === 3) {
 
-  const promedioAnual =
-    truncar2dec(
-      promedios.reduce((a, b) => a + b, 0) / promedios.length
-    );
+        // ------------------------------------------------------
+        // PROMEDIO GENERAL
+        // Se calcula sobre los promedios trimestrales YA
+        // TRUNCADOS.
+        // ------------------------------------------------------
 
-  // ------------------------------------------------------
-  // SI EL PROMEDIO DISPONIBLE ES >= 6
-  // ------------------------------------------------------
+        const promedioAnual =
+          truncar2dec(
+            promedios.reduce((a, b) => a + b, 0) / 3
+          );
 
-  if (promedioAnual >= 6) {
 
-    promedioFinal = promedioAnual;
+        // ------------------------------------------------------
+        // SI EL PROMEDIO ANUAL ES >= 6
+        // ------------------------------------------------------
 
-    // No corresponde Diciembre ni Marzo
-    exDicInput.value = '';
-    exMarInput.value = '';
+        if (promedioAnual >= 6) {
 
-    exDicInput.disabled = true;
-    exMarInput.disabled = true;
+          promedioFinal = promedioAnual;
 
-    exDicInput.style.background = '#eee';
-    exMarInput.style.background = '#eee';
 
-  } else {
+          // Diciembre y marzo no corresponden
 
-    // ----------------------------------------------------
-    // PROMEDIO < 6
-    // SE PUEDE RENDIR DICIEMBRE
-    // ----------------------------------------------------
+          exDicInput.value = '';
+          exMarInput.value = '';
 
-    if (!isNaN(exDicVal) && exDicVal >= 6) {
+          exDicInput.disabled = true;
+          exMarInput.disabled = true;
 
-      promedioFinal = exDicVal;
+          exDicInput.style.background = '#eee';
+          exMarInput.style.background = '#eee';
 
-      // Si aprobó Diciembre, Marzo queda deshabilitado
-      exMarInput.value = '';
-      exMarInput.disabled = true;
-      exMarInput.style.background = '#eee';
 
-    } else {
+        } else {
 
-      // --------------------------------------------------
-      // DICIEMBRE NO APROBADO
-      // MARZO PUEDE SER UTILIZADO
-      // --------------------------------------------------
+          // ----------------------------------------------------
+          // PROMEDIO ANUAL < 6
+          // SE PUEDE RENDIR DICIEMBRE
+          // ----------------------------------------------------
 
-      exMarInput.disabled = false;
-      exMarInput.style.background = '';
+          if (!isNaN(exDicVal) && exDicVal >= 6) {
 
-      if (!isNaN(exMarVal) && exMarVal >= 6) {
+            promedioFinal = exDicVal;
 
-        promedioFinal = exMarVal;
 
-      } else {
+            // Si aprobó diciembre,
+            // marzo queda deshabilitado.
 
-        // Ningún examen aprobó.
-        // Se conserva el promedio disponible.
+            exMarInput.value = '';
+            exMarInput.disabled = true;
+            exMarInput.style.background = '#eee';
 
-        promedioFinal = promedioAnual;
+
+          } else {
+
+            // --------------------------------------------------
+            // DICIEMBRE NO APROBADO
+            // MARZO PUEDE SER UTILIZADO
+            // --------------------------------------------------
+
+            exMarInput.disabled = false;
+            exMarInput.style.background = '';
+
+
+            if (!isNaN(exMarVal) && exMarVal >= 6) {
+
+              promedioFinal = exMarVal;
+
+            } else {
+
+              // Ningún examen aprobó.
+              // Se conserva el promedio anual.
+
+              promedioFinal = promedioAnual;
+
+            }
+
+          }
+
+        }
 
       }
 
-    }
+
+      // ========================================================
+      // MOSTRAR PROMEDIO FINAL
+      // ========================================================
+
+      if (promedioFinal !== null) {
+
+        promedioFinalInput.value =
+          Number(promedioFinal).toFixed(2);
+
+        promedioFinalInput.style.color = '';
+        promedioFinalInput.style.fontWeight = '';
+
+      } else {
+
+        promedioFinalInput.value = '';
+
+      }
+
+    });
 
   }
-
-}
 
 
   // ============================================================
