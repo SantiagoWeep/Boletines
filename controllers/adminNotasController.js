@@ -90,15 +90,15 @@ exports.mostrarNotas = async (req, res) => {
     });
 
     // CÁLCULO FINAL + ORDEN ALFABÉTICO
-    const cursosArray = Object.values(cursos).map(c => ({
-      curso_id: c.curso_id,
-      curso: c.curso,
-      materias: Object.values(c.materias).map(m => ({
-        materia_id: m.materia_id,
-        materia_nombre: m.materia_nombre,
-        profesor_nombre: m.profesor_nombre,
-        profesor_apellido: m.profesor_apellido,
-        alumnos: Array.from(m.alumnos.values())
+    const cursosArray = Object.values(cursos).map(c => ({ 
+  curso_id: c.curso_id,
+  curso: c.curso, 
+  materias: Object.values(c.materias).map(m => ({ 
+    materia_id: m.materia_id,
+    materia_nombre: m.materia_nombre, 
+    profesor_nombre: m.profesor_nombre, 
+    profesor_apellido: m.profesor_apellido, 
+    alumnos: Array.from(m.alumnos.values()) 
           .map(al => {
 
             const promsTrim = al.notas
@@ -238,13 +238,15 @@ ORDER BY c.id, m.id, a.apellido, a.nombre, n.trimestre, n.numero
       }
     });
 
-    const cursosArray = Object.values(cursos).map(c => ({
-      curso: c.curso,
-      materias: Object.values(c.materias).map(m => ({
-        materia_nombre: m.materia_nombre,
-        profesor_nombre: m.profesor_nombre,
-        profesor_apellido: m.profesor_apellido,
-        alumnos: Array.from(m.alumnos.values())
+     const cursosArray = Object.values(cursos).map(c => ({ 
+  curso_id: c.curso_id,
+  curso: c.curso, 
+  materias: Object.values(c.materias).map(m => ({ 
+    materia_id: m.materia_id,
+    materia_nombre: m.materia_nombre, 
+    profesor_nombre: m.profesor_nombre, 
+    profesor_apellido: m.profesor_apellido, 
+    alumnos: Array.from(m.alumnos.values()) 
           .map(al => {
             const proms = al.notas.map(t => {
               const v = Object.values(t.calificaciones).filter(n => n !== null);

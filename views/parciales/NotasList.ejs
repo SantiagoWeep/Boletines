@@ -66,6 +66,18 @@
           <% }) %>
         </tbody>
       </table>
+
+      <div class="text-end mt-2">
+
+          <a
+            href="/admin/notas/imprimir/<%= curso.curso_id %>/<%= materia.materia_id %>"
+            target="_blank"
+            class="btn btn-sm btn-secondary"
+          >
+            🖨️ Imprimir
+          </a>
+
+        </div>
     <% }) %>
   <% }) %>
 <% } %>
