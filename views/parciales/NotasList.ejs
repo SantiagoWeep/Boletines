@@ -35,12 +35,11 @@
             <tr>
               <td><%= al.apellido %>, <%= al.nombre %></td>
 
-              <% al.notas.forEach(tri => { 
-                const vals = Object.values(tri.calificaciones).filter(n => n !== null);
-                const prom = vals.length 
-                  ? (Math.trunc((vals.reduce((a,b)=>a+b,0) / vals.length) * 100) / 100).toFixed(2)
-                  : '-';
-              %>
+              <% al.notas.forEach((tri, i) => {
+                  const prom = al.promedios_trimestrales[i] !== null
+                    ? al.promedios_trimestrales[i].toFixed(2)
+                    : '-';
+                %>
                 <td class="nota">
                   <div class="nota-grid">
                     <% [1,2,3,4].forEach(i => { %>
@@ -54,14 +53,10 @@
               <td class="examen"><%= al.examen_dic ?? '-' %></td>
               <td class="examen"><%= al.examen_mar ?? '-' %></td>
               <td class="promedio-final">
-                <% if(al.estado === 'EP'){ %>
-                EP
-                <% } else if(al.promedio_final !== null){ %>
-                <%= al.promedio_final.toFixed(2) %>
-                <% } else { %>
-                -
-                <% } %>
-              </td>
+              <%= al.promedio_final !== null
+                ? al.promedio_final.toFixed(2)
+                : '-' %>
+            </td>
             </tr>
           <% }) %>
         </tbody>

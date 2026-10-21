@@ -21,7 +21,8 @@ exports.mostrarBoletines = async (req, res) => {
       v.nota_final,
       v.estado
     FROM vista_boletines v
-    JOIN alumnos a ON v.alumno_id = a.id
+JOIN alumnos a ON v.alumno_id = a.id
+JOIN cursos c ON c.nombre = v.curso
   `;
 
   const params = [];
@@ -31,7 +32,13 @@ exports.mostrarBoletines = async (req, res) => {
     params.push(cursoFiltro);
   }
 
-  sql += " ORDER BY v.curso, a.apellido, a.nombre, v.materia";
+  sql += `
+  ORDER BY
+    c.orden ASC,
+    a.apellido COLLATE utf8mb4_spanish_ci ASC,
+    a.nombre COLLATE utf8mb4_spanish_ci ASC,
+    v.materia ASC
+`;
 
   const [rows] = await db.query(sql, params);
 

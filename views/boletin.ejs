@@ -1,132 +1,464 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="/images/pedilink-icono.png" type="image/png">
   <title>Boletín de Calificaciones</title>
 
   <style>
     @import url('/vendor/poppins/poppins/index.css');
 
+    :root {
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --background: #f8fafc;
+      --success: #15803d;
+      --success-light: #f0fdf4;
+      --danger: #b91c1c;
+      --danger-light: #fef2f2;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Poppins', sans-serif;
-      background: #f4f7fc;
       margin: 0;
-      padding: 2rem;
-      color: #333;
+      padding: 32px 20px;
+      background: var(--background);
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+      padding: 28px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 5px 20px rgba(15, 23, 42, .04);
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--primary);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
     }
 
     h1 {
-      text-align: center;
-      margin-bottom: 2rem;
+      margin: 0;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+
+    .student-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .student-info strong {
+      color: var(--text);
+    }
+
+    .print-button {
+      padding: 11px 18px;
+      border: none;
+      border-radius: 10px;
+      background: var(--primary);
+      color: white;
+      font: inherit;
+      font-size: .9rem;
       font-weight: 600;
-      color: #4a90e2;
+      cursor: pointer;
+    }
+
+    .print-button:hover {
+      background: #1d4ed8;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 26px 0 16px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .subject-count {
+      color: var(--muted);
+      font-size: .85rem;
     }
 
     .cards-container {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1.5rem;
-      max-width: 1000px;
-      margin: 0 auto;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+      gap: 18px;
     }
 
     .card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      padding: 1.5rem;
-      transition: transform 0.2s;
+      min-width: 0;
+      padding: 22px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, .035);
+      break-inside: avoid;
     }
 
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    .card h3 {
+      margin: 0 0 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 1.05rem;
+      overflow-wrap: anywhere;
     }
 
-    .card h2 {
-      margin-top: 0;
-      font-size: 1.2rem;
-      color: #333;
+    .trimester-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .grade {
+      padding: 12px 4px;
+      text-align: center;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .grade-label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: .7rem;
       font-weight: 600;
-      border-bottom: 2px solid #4a90e2;
-      padding-bottom: 0.3rem;
     }
 
-    .notas p {
-      margin: 0.4rem 0;
-      font-size: 0.95rem;
-      color: #555;
+    .grade-value {
+      font-size: 1.2rem;
+      font-weight: 700;
     }
 
-    .notas p strong {
-      color: #333;
+    .exams {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
     }
 
-    .notas p.promedio {
-      font-weight: bold;
-      color: #e94e77;
+    .exam {
+      flex: 1;
+      min-width: 110px;
+      padding: 10px 12px;
+      border: 1px solid #bfdbfe;
+      border-radius: 9px;
+      background: var(--primary-light);
+      font-size: .85rem;
     }
 
+    .exam strong {
+      display: block;
+      margin-top: 4px;
+      color: var(--primary);
+      font-size: 1.05rem;
+    }
 
-    @media (max-width: 400px) {
+    .final-grade {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 11px;
+      background: var(--success-light);
+      border: 1px solid #bbf7d0;
+    }
+
+    .final-grade.failed {
+      background: var(--danger-light);
+      border-color: #fecaca;
+    }
+
+    .final-label {
+      font-size: .86rem;
+      font-weight: 600;
+    }
+
+    .final-value {
+      color: var(--success);
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .failed .final-value {
+      color: var(--danger);
+    }
+
+    .status {
+      display: block;
+      margin-top: 3px;
+      font-size: .72rem;
+      font-weight: 600;
+    }
+
+    .empty {
+      padding: 28px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 14px 10px;
+      }
+
+      .header {
+        padding: 20px 16px;
+      }
+
+      .card {
+        padding: 17px;
+      }
+
+      .print-button {
+        width: 100%;
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 12mm;
+      }
+
+      body {
+        padding: 0;
+        background: white;
+        font-size: 10pt;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .container {
+        max-width: none;
+      }
+
+      .header {
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      .print-button {
+        display: none;
+      }
+
       .cards-container {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .card {
+        padding: 13px;
+        border-radius: 8px;
+        box-shadow: none;
+      }
+
+      .card h3 {
+        font-size: 10pt;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+      }
+
+      .grade {
+        padding: 8px 2px;
+      }
+
+      .grade-value {
+        font-size: 12pt;
+      }
+
+      .final-grade {
+        padding: 9px;
+        margin-top: 12px;
+      }
+
+      .final-value {
+        font-size: 13pt;
+      }
+
+      .section-heading {
+        margin: 14px 0 10px;
+      }
+
+      .card,
+      .final-grade,
+      .exams {
+        break-inside: avoid;
       }
     }
   </style>
 </head>
+
 <body>
-  <h1>Boletín de <%= alumno.nombre %> <%= alumno.apellido %></h1>
+  <main class="container">
+    <header class="header">
+      <div>
+        <p class="eyebrow">Boletín de calificaciones</p>
 
-  <div class="cards-container">
-    <% materias.forEach(materia => { %>
-      <div class="card">
-        <h2><%= materia.nombre %></h2>
-        <div class="notas">
+        <h1>
+          <%= alumno.apellido %>, <%= alumno.nombre %>
+        </h1>
 
-        <p>
-  <strong>1° Trimestre:</strong>
-  <span><%= materia.notas.T1 %></span>
-</p>
+        <div class="student-info">
+          <span>
+            <strong>Curso:</strong>
+            <%= alumno.curso ?? '-' %>
+          </span>
 
-          <p>
-            <strong>2° Trimestre:</strong>
-            <span><%= materia.notas.T2 %></span>
-          </p>
+          <% if (alumno.dni) { %>
+            <span>
+              <strong>DNI:</strong>
+              <%= alumno.dni %>
+            </span>
+          <% } %>
 
-          <p>
-            <strong>3° Trimestre:</strong>
-            <span><%= materia.notas.T3 %></span>
-          </p>
-
-            <% if (materia.examenDic) { %>
-              <p>
-              <strong>Examen Dic:</strong>
-              <span style="color:#0b5ed7;font-weight:bold"><%= materia.examenDic %></span>
-              </p>
-              <% } %>
-
-              <% if (materia.examenMar) { %>
-              <p>
-              <strong>Examen Mar:</strong>
-              <span style="color:#0b5ed7;font-weight:bold"><%= materia.examenMar %></span>
-              </p>
-              <% } %>
-
-
-          <p class="promedio">
-  <strong>Promedio Final:</strong>
-  <span style="color:#116e05">
-    <%= materia.promedioFinal %>
-  </span>
-</p>   
-
+          <% if (alumno.edad != null) { %>
+            <span>
+              <strong>Edad:</strong>
+              <%= alumno.edad %>
+            </span>
+          <% } %>
         </div>
       </div>
-    <% }) %>
-  </div>
-  
+
+      <button
+        class="print-button"
+        type="button"
+        onclick="window.print()"
+      >
+        Imprimir boletín
+      </button>
+    </header>
+
+    <div class="section-heading">
+      <h2>Resumen por materia</h2>
+      <span class="subject-count">
+        <%= alumno.materias.length %>
+        materias
+      </span>
+    </div>
+
+    <% if (alumno.materias.length === 0) { %>
+      <div class="empty">
+        No hay calificaciones disponibles para este alumno.
+      </div>
+    <% } else { %>
+      <section class="cards-container">
+        <% alumno.materias.forEach(materia => {
+          const final = materia.promedioFinal;
+          const desaprobado =
+            materia.estado === 'DESAPROBADO' ||
+            (final != null && Number(final) < 6);
+        %>
+          <article class="card">
+            <h3><%= materia.materia %></h3>
+
+            <div class="trimester-grid">
+              <div class="grade">
+                <span class="grade-label">1.er trimestre</span>
+                <span class="grade-value">
+                  <%= materia.t1 ?? '-' %>
+                </span>
+              </div>
+
+              <div class="grade">
+                <span class="grade-label">2.º trimestre</span>
+                <span class="grade-value">
+                  <%= materia.t2 ?? '-' %>
+                </span>
+              </div>
+
+              <div class="grade">
+                <span class="grade-label">3.er trimestre</span>
+                <span class="grade-value">
+                  <%= materia.t3 ?? '-' %>
+                </span>
+              </div>
+            </div>
+
+            <% if (materia.nota_diciembre != null ||
+                  materia.nota_marzo != null) { %>
+              <div class="exams">
+                <% if (materia.nota_diciembre != null) { %>
+                  <div class="exam">
+                    Examen de diciembre
+                    <strong><%= materia.nota_diciembre %></strong>
+                  </div>
+                <% } %>
+
+                <% if (materia.nota_marzo != null) { %>
+                  <div class="exam">
+                    Examen de marzo
+                    <strong><%= materia.nota_marzo %></strong>
+                  </div>
+                <% } %>
+              </div>
+            <% } %>
+
+            <div class="final-grade <%= desaprobado ? 'failed' : '' %>">
+              <div class="final-label">
+                Promedio final
+
+                <% if (final != null) { %>
+                  <span class="status">
+                    <%= desaprobado ? 'Desaprobado' : 'Aprobado' %>
+                  </span>
+                <% } %>
+              </div>
+
+              <span class="final-value">
+                <%= final ?? '-' %>
+              </span>
+            </div>
+          </article>
+        <% }) %>
+      </section>
+    <% } %>
+  </main>
 </body>
 </html>

@@ -238,48 +238,82 @@ ORDER BY c.id, m.id, a.apellido, a.nombre, n.trimestre, n.numero
       }
     });
 
-     const cursosArray = Object.values(cursos).map(c => ({ 
+     const truncar2Decimales = (valor) =>
+  Math.trunc((valor + Number.EPSILON) * 100) / 100;
+
+const cursosArray = Object.values(cursos).map(c => ({
   curso_id: c.curso_id,
-  curso: c.curso, 
-  materias: Object.values(c.materias).map(m => ({ 
+  curso: c.curso,
+
+  materias: Object.values(c.materias).map(m => ({
     materia_id: m.materia_id,
-    materia_nombre: m.materia_nombre, 
-    profesor_nombre: m.profesor_nombre, 
-    profesor_apellido: m.profesor_apellido, 
-    alumnos: Array.from(m.alumnos.values()) 
-          .map(al => {
-            const proms = al.notas.map(t => {
-              const v = Object.values(t.calificaciones).filter(n => n !== null);
-              return v.length ? truncar2Decimales(v.reduce((a,b)=>a+b,0)/v.length) : null;
-            }).filter(x => x !== null);
+    materia_nombre: m.materia_nombre,
+    profesor_nombre: m.profesor_nombre,
+    profesor_apellido: m.profesor_apellido,
 
-            let final = proms.length ? truncar2Decimales(proms.reduce((a,b)=>a+b,0)/proms.length) : null;
-            const exD = al.examen_dic; const exM = al.examen_mar;
-            if ((final===null || final<6) && exD>=6) final = exD;
-            else if ((final===null || final<6) && exM>=6) final = exM;
+    alumnos: Array.from(m.alumnos.values())
+      .map(al => {
+        const promedios = al.notas.map(tri => {
+          const valores = Object.values(tri.calificaciones)
+            .filter(n => n !== null);
 
-            let estado = 'APROBADO';
+          return valores.length
+            ? truncar2Decimales(
+                valores.reduce((a, b) => a + b, 0) / valores.length
+              )
+            : null;
+        });
 
-          if (final === null || final < 6) {
-            estado = 'EP';
-          }
+        // El promedio final se calcula con los tres trimestres.
+        const validos = promedios.filter(n => n !== null);
 
-          return {
-            ...al,
-            promedio_final: final,
-            estado
-          };
-          })
-          .sort((a,b) => {
-            const aa = (a.apellido||'').toLowerCase();
-            const bb = (b.apellido||'').toLowerCase();
-            if (aa !== bb) return aa.localeCompare(bb);
-            return (a.nombre||'').toLowerCase().localeCompare(b.nombre||'');
-          })
-      }))
-    }));
+        let final = validos.length
+          ? truncar2Decimales(
+              validos.reduce((a, b) => a + b, 0) / validos.length
+            )
+          : null;
 
-    res.render('parciales/NotasList', { cursos: cursosArray, search: q, layout: false });
+        const exD = al.examen_dic;
+        const exM = al.examen_mar;
+
+        if ((final === null || final < 6) && exD !== null && exD >= 6) {
+          final = exD;
+        } else if (
+          (final === null || final < 6) &&
+          exM !== null &&
+          exM >= 6
+        ) {
+          final = exM;
+        }
+
+        return {
+          ...al,
+          promedios_trimestrales: promedios,
+          promedio_final: final,
+          estado: final !== null && final >= 6
+            ? 'APROBADO'
+            : 'DESAPROBADO'
+        };
+      })
+      .sort((a, b) => {
+        const apellido = (a.apellido || '').localeCompare(
+          b.apellido || '',
+          'es'
+        );
+
+        return apellido || (a.nombre || '').localeCompare(
+          b.nombre || '',
+          'es'
+        );
+      })
+  }))
+}));
+
+res.render('parciales/NotasList', {
+  cursos: cursosArray,
+  search: q,
+  layout: false
+});
 
   } catch (err) {
     console.error('Error búsqueda:', err);
