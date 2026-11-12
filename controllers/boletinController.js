@@ -1,68 +1,68 @@
-// controllers/boletinController.js
-const db = require('../config/db');
 
+const db = require('../config/db');
 
 exports.mostrarBoletin = async (req, res) => {
 
-const alumnoId = req.alumno.id;
+    const alumnoId = req.alumno.id;
 
-try {
+    try {
 
-const [alumnoRows] = await db.query(
-"SELECT * FROM alumnos WHERE id = ?",
-[alumnoId]
-);
+        const [alumnoRows] = await db.query(
+            "SELECT * FROM alumnos WHERE id = ?",
+            [alumnoId]
+        );
 
-if(!alumnoRows.length){
-return res.status(404).send("Alumno no encontrado");
-}
+        if (!alumnoRows.length) {
+            return res.status(404).send("Alumno no encontrado");
+        }
 
-const alumno = alumnoRows[0];
+        const alumno = alumnoRows[0];
 
-const [rows] = await db.query(`
-SELECT 
-materia,
-t1,
-t2,
-t3,
-examen_dic,
-examen_mar,
-nota_final
-FROM vista_boletines
-WHERE alumno_id = ?
+        const [rows] = await db.query(`
+            SELECT
+                materia,
+                t1,
+                t2,
+                t3,
+                examen_dic,
+                examen_mar,
+                nota_final,
+                estado
+            FROM vista_boletines
+            WHERE alumno_id = ?
+            ORDER BY materia
+        `, [alumnoId]);
 
-ORDER BY materia
-`,[alumnoId]);
+        // Construimos las materias con la estructura
+        // que espera boletin.ejs.
+        alumno.materias = rows.map(r => ({
 
-const materias = rows.map(r => ({
+            materia: r.materia,
 
-nombre: r.materia,
+            t1: r.t1,
+            t2: r.t2,
+            t3: r.t3,
 
-notas:{
-T1: r.t1 ?? "-",
-T2: r.t2 ?? "-",
-T3: r.t3 ?? "-"
-},
+            nota_diciembre: r.examen_dic,
+            nota_marzo: r.examen_mar,
 
-examenDic: r.examen_dic,
-examenMar: r.examen_mar,
+            promedioFinal: r.nota_final,
 
-estado: r.nota_final === null ? "EP" : "APROBADO",
-promedioFinal: r.nota_final === null ? "EP" : r.nota_final
+            estado: r.estado
 
-}));
+        }));
 
-res.render("boletin",{
-layout:false,
-alumno,
-materias
-});
+        res.render("boletin", {
+            layout: false,
+            alumno
+        });
 
-} catch(err){
+    } catch (err) {
 
-console.error("Error al mostrar boletín:",err);
-res.status(500).send("Error interno");
+        console.error("Error al mostrar boletín:", err);
 
-}
+        res.status(500).send("Error interno");
+
+    }
 
 };
